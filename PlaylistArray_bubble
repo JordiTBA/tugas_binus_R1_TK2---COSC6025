@@ -1,0 +1,248 @@
+/*
+ * Team Assignment 2 - Data Structures and Algorithm Analysis (COSC6025036)
+ * Session 8 - Group 6
+ *
+ * Anggota Kelompok:
+ * 1. DWILALA ASYIROTUL AMINIYAH  - 2902692762
+ * 2. DAROJATUL ULIYAH            - 2902716182
+ * 3. JASON CHRISTOFER HANDIKA    - 2902689566
+ * 4. ASMA' GHAITSANI FUAIZAH     - 2902737703
+ * 5. DENDY RAMDHAN FAUZY         - 2902724966
+ *
+ * Kelas: TBHA - LEC
+ */
+
+import java.util.Scanner;
+
+// Class Lagu merepresentasikan satu objek lagu dalam playlist
+class Lagu {
+    String judul;
+    String artis;
+    double durasi; // durasi dalam menit
+
+    // Constructor untuk inisialisasi objek Lagu
+    public Lagu(String judul, String artis, double durasi) {
+        this.judul = judul;
+        this.artis = artis;
+        this.durasi = durasi;
+    }
+
+    // Method untuk menampilkan informasi lagu
+    public void tampilkanInfo() {
+        System.out.printf("  Judul  : %s%n", judul);
+        System.out.printf("  Artis  : %s%n", artis);
+        System.out.printf("  Durasi : %.2f menit%n", durasi);
+    }
+}
+
+// Class utama yang mengelola playlist menggunakan array statis
+public class PlaylistArray {
+
+    // Array statis dengan kapasitas maksimum 10 lagu
+    static Lagu[] playlist = new Lagu[10];
+
+    // Variabel untuk melacak jumlah lagu yang tersimpan saat ini
+    static int jumlahLagu = 0;
+
+    // =====================================================
+    // TRAVERSAL - Menampilkan seluruh lagu dalam playlist
+    // =====================================================
+    static void tampilkanSemuaLagu() {
+        if (jumlahLagu == 0) {
+            System.out.println("\nPlaylist kosong. Belum ada lagu yang ditambahkan.");
+            return;
+        }
+
+        System.out.println("\n===== DAFTAR LAGU DALAM PLAYLIST =====");
+        for (int i = 0; i < jumlahLagu; i++) {
+            System.out.println("\nLagu ke-" + (i + 1) + ":");
+            playlist[i].tampilkanInfo();
+        }
+        System.out.println("\nTotal lagu: " + jumlahLagu + "/10");
+    }
+
+    // =====================================================
+    // INSERTION - Menambahkan lagu baru ke dalam playlist
+    // =====================================================
+    static void tambahLagu(Scanner scanner) {
+        if (jumlahLagu >= 10) {
+            System.out.println("\nPlaylist sudah penuh! Maksimum 10 lagu.");
+            return;
+        }
+
+        System.out.println("\n--- Tambah Lagu Baru ---");
+        System.out.print("Masukkan judul lagu : ");
+        String judul = scanner.nextLine();
+
+        System.out.print("Masukkan nama artis : ");
+        String artis = scanner.nextLine();
+
+        System.out.print("Masukkan durasi (menit) : ");
+        if (scanner.hasNextDouble()) {
+            double durasi = scanner.nextDouble();
+            if (scanner.hasNextLine()) scanner.nextLine();
+
+            playlist[jumlahLagu] = new Lagu(judul, artis, durasi);
+            jumlahLagu++;
+
+            System.out.println("Lagu \"" + judul + "\" berhasil ditambahkan ke playlist!");
+        } else {
+            System.out.println("Format durasi tidak valid! Silakan ulangi.");
+            if (scanner.hasNextLine()) scanner.nextLine();
+        }
+    }
+
+    // =====================================================
+    // DELETION - Menghapus lagu berdasarkan judul
+    // =====================================================
+    static void hapusLagu(Scanner scanner) {
+        if (jumlahLagu == 0) {
+            System.out.println("\nPlaylist kosong. Tidak ada lagu untuk dihapus.");
+            return;
+        }
+
+        System.out.println("\n--- Hapus Lagu ---");
+        System.out.print("Masukkan judul lagu yang ingin dihapus: ");
+        String judul = scanner.nextLine();
+
+        int indeks = -1;
+        for (int i = 0; i < jumlahLagu; i++) {
+            if (playlist[i].judul.equalsIgnoreCase(judul)) {
+                indeks = i;
+                break;
+            }
+        }
+
+        if (indeks == -1) {
+            System.out.println("Lagu \"" + judul + "\" tidak ditemukan dalam playlist.");
+            return;
+        }
+
+        System.out.println("Lagu \"" + playlist[indeks].judul + "\" berhasil dihapus.");
+
+        for (int i = indeks; i < jumlahLagu - 1; i++) {
+            playlist[i] = playlist[i + 1];
+        }
+
+        playlist[jumlahLagu - 1] = null;
+        jumlahLagu--;
+    }
+
+    // =====================================================
+    // SEARCHING - Mencari lagu berdasarkan judul
+    // =====================================================
+    static void cariLagu(Scanner scanner) {
+        if (jumlahLagu == 0) {
+            System.out.println("\nPlaylist kosong. Tidak ada lagu untuk dicari.");
+            return;
+        }
+
+        System.out.println("\n--- Cari Lagu ---");
+        System.out.print("Masukkan judul lagu yang dicari: ");
+        String judul = scanner.nextLine();
+
+        for (int i = 0; i < jumlahLagu; i++) {
+            if (playlist[i].judul.equalsIgnoreCase(judul)) {
+                System.out.println("\nLagu ditemukan pada posisi ke-" + (i + 1) + ":");
+                playlist[i].tampilkanInfo();
+                return;
+            }
+        }
+
+        System.out.println("Lagu \"" + judul + "\" tidak ditemukan dalam playlist.");
+    }
+
+    // =====================================================
+    // SORTING - Mengurutkan lagu berdasarkan durasi (Bubble Sort)
+    // Kompleksitas: O(n^2), karena membandingkan elemen bersebelahan
+    // =====================================================
+    static void urutkanLagu() {
+        if (jumlahLagu == 0) {
+            System.out.println("\nPlaylist kosong. Tidak ada lagu untuk diurutkan.");
+            return;
+        } else if (jumlahLagu == 1) {
+            System.out.println("\nHanya ada 1 lagu, playlist sudah terurut.");
+            return;
+        }
+
+        // Implementasi Bubble Sort (Ascending / Terpendek ke Terpanjang)
+        for (int i = 0; i < jumlahLagu - 1; i++) {
+            for (int j = 0; j < jumlahLagu - i - 1; j++) {
+                // Jika durasi lagu saat ini lebih besar dari lagu berikutnya, tukar posisi
+                if (playlist[j].durasi > playlist[j + 1].durasi) {
+                    Lagu temp = playlist[j];
+                    playlist[j] = playlist[j + 1];
+                    playlist[j + 1] = temp;
+                }
+            }
+        }
+        
+        System.out.println("\nPlaylist berhasil diurutkan berdasarkan durasi (Terpendek -> Terpanjang).");
+        // Langsung tampilkan hasilnya setelah diurutkan
+        tampilkanSemuaLagu();
+    }
+
+    // =====================================================
+    // MAIN METHOD - Menu Interaktif
+    // =====================================================
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int pilihan = 0;
+
+        // Tambahkan beberapa data awal sebagai contoh (Sengaja dibuat tidak terurut durasinya)
+        playlist[0] = new Lagu("Bohemian Rhapsody", "Queen", 5.55);
+        playlist[1] = new Lagu("Blinding Lights", "The Weeknd", 3.20);
+        playlist[2] = new Lagu("Shape of You", "Ed Sheeran", 3.53);
+        jumlahLagu = 3;
+
+        System.out.println("Selamat datang di Sistem Manajemen Playlist Musik!");
+
+        // Loop menu utama
+        do {
+            System.out.println("\n=== MENU PLAYLIST MUSIK ===");
+            System.out.println("1. Tampilkan semua lagu");
+            System.out.println("2. Tambah lagu baru");
+            System.out.println("3. Hapus lagu berdasarkan judul");
+            System.out.println("4. Cari lagu berdasarkan judul");
+            System.out.println("5. Urutkan lagu berdasarkan durasi"); // Menu baru ditambahkan
+            System.out.println("6. Keluar");
+            System.out.print("Pilih menu (1-6): ");
+
+            if (!scanner.hasNextInt()) {
+                System.out.println("\nInput terputus. Menghentikan program.");
+                break; 
+            }
+
+            pilihan = scanner.nextInt();
+
+            if (scanner.hasNextLine()) {
+                scanner.nextLine(); 
+            }
+
+            switch (pilihan) {
+                case 1:
+                    tampilkanSemuaLagu();
+                    break;
+                case 2:
+                    tambahLagu(scanner);
+                    break;
+                case 3:
+                    hapusLagu(scanner);
+                    break;
+                case 4:
+                    cariLagu(scanner);
+                    break;
+                case 5:
+                    urutkanLagu(); // Panggil method sorting
+                    break;
+                case 6:
+                    System.out.println("\nTerima kasih! Program selesai.");
+                    break;
+                default:
+                    System.out.println("\nPilihan tidak valid. Silakan pilih 1-6.");
+            }
+        } while (pilihan != 6);
+
+        scanner.close();
+    }
+}
